@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudySpot Finder - Find Your Perfect Spot</title>
+
+<!-- Leaflet Map -->
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f7f8f5;
+    color: #26352e;
+}
+
+header {
+    background: #234c3b;
+    color: white;
+    padding: 22px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 23px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #b7dcaa;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 22px;
+    font-size: 14px;
+}
+
+.hero {
+    background: linear-gradient(120deg, #234c3b, #477c5b);
+    color: white;
+    padding: 65px 7%;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 38px;
+    margin-bottom: 15px;
+}
+
+.hero p {
+    color: #e0eee3;
+    margin-bottom: 25px;
+}
+
+.search-box {
+    background: white;
+    max-width: 650px;
+    margin: auto;
+    display: flex;
+    padding: 8px;
+    border-radius: 12px;
+}
+
+.search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 12px;
+    font-size: 15px;
+    min-width: 0;
+}
+
+.search-box button {
+    background: #e2a85c;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.section-title {
+    margin-bottom: 22px;
+}
+
+.section-title h2 {
+    font-size: 25px;
+    color: #234c3b;
+}
+
+.section-title p {
+    color: #777;
+    margin-top: 7px;
+}
+
+.filter-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 25px;
+}
+
+.filters {
+    background: white;
+    padding: 22px;
+    border-radius: 13px;
+    height: fit-content;
+    box-shadow: 0 3px 15px #00000008;
+}
+
+.filters h3 {
+    margin-bottom: 18px;
+}
+
+.filter-group {
+    margin-bottom: 22px;
+}
+
+.filter-group h4 {
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.filter-group label {
+    display: block;
+    font-size: 13px;
+    margin: 10px 0;
+    color: #555;
+}
+
+.filter-group input {
+    margin-right: 8px;
+    accent-color: #347653;
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    background: white;
+}
+
+.reset-btn {
+    width: 100%;
+    padding: 11px;
+    background: #eaf2eb;
+    border: none;
+    color: #234c3b;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 17px;
+    gap: 10px;
+}
+
+.results-header p {
+    color: #777;
+    font-size: 14px;
+}
+
+.cafe-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.cafe-card {
+    background: white;
+    border-radius: 13px;
+    overflow: hidden;
+    box-shadow: 0 3px 15px #0000000b;
+    transition: .3s;
+}
+
+.cafe-card:hover {
+    transform: translateY(-5px);
+}
+
+.cafe-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.card-content {
+    padding: 17px;
+}
+
+.card-content h3 {
+    color: #234c3b;
+    margin-bottom: 8px;
+}
+
+.location {
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.rating {
+    color: #d99532;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 12px 0;
+}
+
+.tag {
+    background: #edf4ed;
+    color: #39704e;
+    padding: 6px 9px;
+    font-size: 11px;
+    border-radius: 20px;
+}
+
+.noise {
+    font-size: 13px;
+    color: #666;
+    margin: 10px 0;
+}
+
+.review {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 14px;
+}
+
+.detail-btn {
+    display: block;
+    text-align: center;
+    background: #234c3b;
+    color: white;
+    text-decoration: none;
+    padding: 11px;
+    border-radius: 7px;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+}
+
+.empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 12px;
+    color: #777;
+}
+
+.map-section {
+    margin-top: 55px;
+}
+
+#map {
+    width: 100%;
+    height: 400px;
+    border-radius: 13px;
+    z-index: 1;
+}
+
+footer {
+    margin-top: 60px;
+    padding: 30px;
+    text-align: center;
+    background: #234c3b;
+    color: white;
+    font-size: 13px;
+}
+
+@media(max-width: 800px) {
+    .filter-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .cafe-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero h1 {
+        font-size: 28px;
+    }
+
+    nav {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">StudySpot<span>.</span></div>
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#explore">Explore Cafe</a>
+        <a href="#map-section">Map</a>
+    </nav>
+</header>
+
+<section class="hero" id="home">
+    <h1>Find Your Perfect Study Spot ☕</h1>
+    <p>
+        Temukan cafe terbaik untuk belajar, bekerja,
+        dan meningkatkan produktivitasmu.
+    </p>
+
+    <div class="search-box">
+        <input type="text" id="search"
+        placeholder="Cari cafe atau lokasi...">
+        <button onclick="filterCafes()">Search</button>
+    </div>
+</section>
+
+<main class="container" id="explore">
+
+    <div class="section-title">
+        <h2>Explore Study Spots</h2>
+        <p>Temukan tempat yang sesuai dengan kebutuhanmu.</p>
+    </div>
+
+    <div class="filter-layout">
+
+        <!-- FILTER -->
+        <aside class="filters">
+            <h3>Filter Amenities</h3>
+
+            <div class="filter-group">
+                <h4>Fasilitas</h4>
+
+                <label>
+                    <input type="checkbox" class="amenity"
+                    value="wifi">
+                    WiFi
+                </label>
+
+                <label>
+                    <input type="checkbox" class="amenity"
+                    value="outlet">
+                    Stopkontak
+                </label>
+
+                <label>
+                    <input type="checkbox" class="amenity"
+                    value="food">
+                    Makanan
+                </label>
+
+                <label>
+                    <input type="checkbox" class="amenity"
+                    value="drink">
+                    Minuman
+                </label>
+            </div>
+
+            <div class="filter-group">
+                <h4>Tingkat Kebisingan</h4>
+
+                <select id="noise">
+                    <option value="">Semua tingkat</option>
+                    <option value="Tenang">Tenang</option>
+                    <option value="Sedang">Sedang</option>
+                    <option value="Ramai">Ramai</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <h4>Minimal Rating</h4>
+
+                <select id="rating">
+                    <option value="0">Semua rating</option>
+                    <option value="3">3+ bintang</option>
+                    <option value="4">4+ bintang</option>
+                    <option value="4.5">4.5+ bintang</option>
+                </select>
+            </div>
+
+            <button class="reset-btn"
+            onclick="resetFilters()">
+                Reset Filter
+            </button>
+        </aside>
+
+        <!-- HASIL PENCARIAN -->
+        <section>
+            <div class="results-header">
+                <h3>Recommended Cafe</h3>
+                <p id="count">0 tempat ditemukan</p>
+            </div>
+
+            <div class="cafe-grid" id="cafe-list"></div>
+        </section>
+
+    </div>
+
+    <!-- MAP -->
+    <section class="map-section" id="map-section">
+        <div class="section-title">
+            <h2>Interactive Cafe Map 📍</h2>
+            <p>Lihat lokasi study spot pada peta.</p>
+        </div>
+
+        <div id="map"></div>
+    </section>
+
+</main>
+
+<footer>
+    <p>© 2026 StudySpot Finder | Find Your Focus, Find Your Place.</p>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+// DATA CAFE DEMO
+// Lokasi dan ulasan berikut hanya data contoh.
+
+const cafes = [
+    {
+        name: "Kopi Fokus",
+        location: "Bekasi",
+        rating: 4.8,
+        noise: "Tenang",
+        amenities: ["wifi", "outlet", "food", "drink"],
+        review: "Tempat nyaman untuk mengerjakan tugas. WiFi stabil dan banyak colokan.",
+        image: "https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=700",
+        lat: -6.2383,
+        lng: 106.9756
+    },
+    {
+        name: "Green Corner Cafe",
+        location: "Bekasi",
+        rating: 4.5,
+        noise: "Sedang",
+        amenities: ["wifi", "food", "drink"],
+        review: "Suasana estetik dan cocok untuk belajar santai.",
+        image: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=700",
+        lat: -6.2450,
+        lng: 106.9900
+    },
+    {
+        name: "The Quiet Space",
+        location: "Jakarta Timur",
+        rating: 4.9,
+        noise: "Tenang",
+        amenities: ["wifi", "outlet", "drink"],
+        review: "Suasana sangat tenang, cocok untuk fokus dan membaca.",
+        image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=700",
+        lat: -6.2250,
+        lng: 106.9000
+    },
+    {
+        name: "Urban Coffee",
+        location: "Jakarta Selatan",
+        rating: 4.2,
+        noise: "Ramai",
+        amenities: ["wifi", "outlet", "food", "drink"],
+        review: "Cocok untuk diskusi kelompok dan bekerja bersama.",
+        image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=700",
+        lat: -6.2600,
+        lng: 106.8100
+    }
+];
+
+// INISIALISASI MAP
+const map = L.map('map').setView([-6.2383, 106.9756], 11);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+let markers = [];
+
+// MENAMPILKAN KARTU CAFE
+function displayCafes(data) {
+
+    const list = document.getElementById("cafe-list");
+
+    list.innerHTML = "";
+
+    document.getElementById("count").innerText =
+        data.length + " tempat ditemukan";
+
+    if (data.length === 0) {
+        list.innerHTML = `
+            <div class="empty">
+                <h3>Oops! Cafe tidak ditemukan.</h3>
+                <p>Coba ubah filter pencarianmu.</p>
+            </div>
+        `;
+    }
+
+    data.forEach(cafe => {
+
+        const card = document.createElement("article");
+        card.className = "cafe-card";
+
+        const image = document.createElement("img");
+        image.src = cafe.image;
+        image.alt = cafe.name;
+        image.loading = "lazy";
+
+        const content = document.createElement("div");
+        content.className = "card-content";
+
+        const name = document.createElement("h3");
+        name.textContent = cafe.name;
+
+        const location = document.createElement("p");
+        location.className = "location";
+        location.textContent = "📍 " + cafe.location;
+
+        const rating = document.createElement("div");
+        rating.className = "rating";
+        rating.textContent = "★ " + cafe.rating + " / 5";
+
+        const tags = document.createElement("div");
+        tags.className = "tags";
+
+        const labels = {
+            wifi: "📶 WiFi",
+            outlet: "🔌 Stopkontak",
+            food: "🍜 Makanan",
+            drink: "☕ Minuman"
+        };
+
+        cafe.amenities.forEach(item => {
+            const tag = document.createElement("span");
+            tag.className = "tag";
+            tag.textContent = labels[item];
+            tags.appendChild(tag);
+        });
+
+        const noise = document.createElement("p");
+        noise.className = "noise";
+        noise.textContent = "🔊 Kebisingan: " + cafe.noise;
+
+        const review = document.createElement("p");
+        review.className = "review";
+        review.textContent = '"' + cafe.review + '"';
+
+        const button = document.createElement("button");
+        button.className = "detail-btn";
+        button.textContent = "Lihat Lokasi";
+
+        button.addEventListener("click", () => {
+            map.setView([cafe.lat, cafe.lng], 16);
+            document.getElementById("map-section").scrollIntoView({
+                behavior: "smooth"
+            });
+        });
+
+        content.append(
+            name, location, rating, tags,
+            noise, review, button
+        );
+
+        card.append(image, content);
+        list.appendChild(card);
+    });
+}
+
+// FILTER CAFE
+function filterCafes() {
+
+    const search = document.getElementById("search")
+        .value.toLowerCase();
+
+    const noise = document.getElementById("noise").value;
+
+    const rating = Number(
+        document.getElementById("rating").value
+    );
+
+    const selected = Array.from(
+        document.querySelectorAll(".amenity:checked")
+    ).map(item => item.value);
+
+    const filtered = cafes.filter(cafe => {
+
+        const matchSearch =
+            cafe.name.toLowerCase().includes(search) ||
+            cafe.location.toLowerCase().includes(search);
+
+        const matchNoise =
+            !noise || cafe.noise === noise;
+
+        const matchRating =
+            cafe.rating >= rating;
+
+        const matchAmenities =
+            selected.every(item =>
+                cafe.amenities.includes(item)
+            );
+
+        return matchSearch &&
+            matchNoise &&
+            matchRating &&
+            matchAmenities;
+    });
+
+    displayCafes(filtered);
+    displayMarkers(filtered);
+}
+
+// MENAMPILKAN MARKER PETA
+function displayMarkers(data) {
+
+    markers.forEach(marker => map.removeLayer(marker));
+    markers = [];
+
+    data.forEach(cafe => {
+
+        const marker = L.marker([
+            cafe.lat,
+            cafe.lng
+        ]).addTo(map);
+
+        marker.bindPopup(`
+            <b>${cafe.name}</b><br>
+            ${cafe.location}<br>
+            ⭐ ${cafe.rating}/5<br>
+            ${cafe.noise}
+        `);
+
+        markers.push(marker);
+    });
+}
+
+// RESET FILTER
+function resetFilters() {
+
+    document.getElementById("search").value = "";
+    document.getElementById("noise").value = "";
+    document.getElementById("rating").value = "0";
+
+    document.querySelectorAll(".amenity")
+        .forEach(item => item.checked = false);
+
+    filterCafes();
+}
+
+// EVENT LISTENERS
+document.getElementById("search")
+    .addEventListener("input", filterCafes);
+
+document.getElementById("noise")
+    .addEventListener("change", filterCafes);
+
+document.getElementById("rating")
+    .addEventListener("change", filterCafes);
+
+document.querySelectorAll(".amenity")
+    .forEach(item => {
+        item.addEventListener("change", filterCafes);
+    });
+
+// TAMPILAN AWAL
+displayCafes(cafes);
+displayMarkers(cafes);
+
+</script>
+
+</body>
+</html>
